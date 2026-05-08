@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExcelForge — Data Analyst Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060a14;
+  --surface: #0d1424;
+  --surface2: #131d30;
+  --surface3: #1a2540;
+  --border: #1e2d47;
+  --border2: #253550;
+  --accent: #00e5c3;
+  --accent-dim: rgba(0,229,195,0.12);
+  --blue: #4f8ef7;
+  --blue-dim: rgba(79,142,247,0.12);
+  --amber: #f5a623;
+  --amber-dim: rgba(245,166,35,0.12);
+  --rose: #f43f5e;
+  --rose-dim: rgba(244,63,94,0.12);
+  --purple: #a855f7;
+  --purple-dim: rgba(168,85,247,0.12);
+  --green: #22c55e;
+  --text: #dde4f0;
+  --text2: #8fa3c4;
+  --text3: #4a6080;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Syne', sans-serif;
+  --body: 'DM Sans', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);display:flex;flex-direction:column;}
+
+/* grid bg */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(0,229,195,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,195,0.025) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;z-index:0;
+}
+
+/* TOP NAV */
+.topnav{
+  display:flex;align-items:center;gap:0;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 24px;height:56px;position:relative;z-index:10;flex-shrink:0;
+}
+.logo{font-family:var(--display);font-weight:800;font-size:20px;color:var(--accent);letter-spacing:-0.5px;margin-right:32px;white-space:nowrap;}
+.logo em{color:var(--text);font-style:normal;}
+.topnav-tabs{display:flex;gap:2px;flex:1;overflow-x:auto;}
+.topnav-tabs::-webkit-scrollbar{height:0;}
+.tab-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 14px;border-radius:6px;border:none;background:transparent;
+  color:var(--text2);cursor:pointer;font-family:var(--body);font-size:13px;font-weight:500;
+  white-space:nowrap;transition:all 0.18s;
+}
+.tab-btn:hover{background:var(--surface2);color:var(--text);}
+.tab-btn.active{background:var(--accent-dim);color:var(--accent);}
+.tab-btn .dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:0.7;}
+.topnav-right{display:flex;align-items:center;gap:12px;margin-left:auto;padding-left:16px;}
+.xp-badge{
+  font-family:var(--mono);font-size:11px;
+  background:var(--amber-dim);color:var(--amber);
+  border:1px solid rgba(245,166,35,0.25);
+  padding:4px 10px;border-radius:20px;
+}
+.streak-badge{
+  font-family:var(--mono);font-size:11px;
+  background:var(--rose-dim);color:var(--rose);
+  border:1px solid rgba(244,63,94,0.25);
+  padding:4px 10px;border-radius:20px;
+}
+
+/* MAIN LAYOUT */
+.app-body{display:flex;flex:1;overflow:hidden;position:relative;z-index:1;}
+
+/* SIDEBAR */
+.sidebar{
+  width:260px;min-width:260px;
+  background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sidebar-search{padding:12px 14px;border-bottom:1px solid var(--border);}
+.sidebar-search input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:7px 12px;color:var(--text);font-family:var(--body);font-size:13px;
+  outline:none;
+}
+.sidebar-search input::placeholder{color:var(--text3);}
+.sidebar-search input:focus{border-color:var(--accent);}
+.sidebar-list{flex:1;overflow-y:auto;padding:8px 0;}
+.sidebar-list::-webkit-scrollbar{width:3px;}
+.sidebar-list::-webkit-scrollbar-thumb{background:var(--border);}
+.section-label{
+  padding:10px 16px 4px;
+  font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;
+}
+.lesson-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;cursor:pointer;transition:all 0.15s;
+  border-left:2px solid transparent;font-size:13px;color:var(--text2);
+}
+.lesson-item:hover{background:var(--surface2);color:var(--text);}
+.lesson-item.active{background:var(--accent-dim);border-left-color:var(--accent);color:var(--accent);}
+.lesson-item.done{color:var(--green);}
+.lesson-item .li-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.lesson-item .li-check{margin-left:auto;font-size:11px;color:var(--green);}
+.lesson-item .li-lock{margin-left:auto;font-size:11px;color:var(--text3);}
+
+/* MAIN CONTENT */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* LESSON PANEL */
+.lesson-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.lesson-header{
+  padding:20px 28px 16px;border-bottom:1px solid var(--border);
+  background:var(--surface);flex-shrink:0;
+}
+.lesson-breadcrumb{font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:6px;}
+.lesson-title{font-family:var(--display);font-size:22px;font-weight:700;color:var(--text);}
+.lesson-meta{display:flex;gap:12px;margin-top:8px;}
+.meta-pill{
+  font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:20px;
+}
+.pill-blue{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(79,142,247,0.2);}
+.pill-green{background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.2);}
+.pill-amber{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,166,35,0.2);}
+
+.lesson-body{flex:1;overflow-y:auto;padding:24px 28px;}
+.lesson-body::-webkit-scrollbar{width:4px;}
+.lesson-body::-webkit-scrollbar-thumb{background:var(--border);}
+
+/* Content blocks */
+.content-section{margin-bottom:28px;}
+.content-section h3{font-family:var(--display);font-size:16px;font-weight:700;color:var(--accent);margin-bottom:10px;}
+.content-section p{font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:10px;}
+.content-section ul{font-size:14px;color:var(--text2);line-height:1.9;padding-left:18px;}
+
+/* Formula block */
+.formula-block{
+  background:var(--surface2);border:1px solid var(--border2);border-left:3px solid var(--accent);
+  border-radius:8px;padding:14px 18px;margin:14px 0;
+  font-family:var(--mono);font-size:13px;color:var(--accent);
+  position:relative;
+}
+.formula-block .fb-label{
+  position:absolute;top:-9px;left:14px;
+  background:var(--surface2);padding:0 6px;
+  font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;
+}
+
+/* Example table */
+.excel-table{
+  width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;
+  margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid var(--border);
+}
+.excel-table th{
+  background:var(--surface3);color:var(--text2);font-weight:600;
+  padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);
+}
+.excel-table td{
+  padding:7px 12px;border-bottom:1px solid var(--border);color:var(--text);
+  background:var(--surface2);
+}
+.excel-table tr:last-child td{border-bottom:none;}
+.excel-table td.highlight{color:var(--accent);font-weight:500;}
+.excel-table td.formula{color:var(--blue);}
+.excel-table th:first-child,.excel-table td:first-child{
+  background:var(--surface3);color:var(--text3);font-size:11px;width:40px;text-align:center;
+}
+
+/* TIP box */
+.tip-box{
+  background:var(--amber-dim);border:1px solid rgba(245,166,35,0.2);border-radius:8px;
+  padding:12px 16px;margin:14px 0;font-size:13px;color:var(--text2);
+  display:flex;gap:10px;align-items:flex-start;
+}
+.tip-box .tip-icon{color:var(--amber);font-size:16px;flex-shrink:0;margin-top:1px;}
+
+/* PRACTICE SECTION */
+.practice-panel{
+  border-top:1px solid var(--border);background:var(--surface);
+  flex-shrink:0;
+}
+.practice-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 28px;border-bottom:1px solid var(--border);cursor:pointer;
+}
+.practice-header-left{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px;}
+.practice-toggle{font-family:var(--mono);font-size:11px;color:var(--text3);}
+.practice-body{padding:16px 28px;display:none;}
+.practice-body.open{display:block;}
+
+.quiz-question{font-size:14px;color:var(--text);margin-bottom:14px;line-height:1.6;}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.quiz-opt{
+  background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;cursor:pointer;font-family:var(--mono);font-size:12.5px;
+  color:var(--text2);transition:all 0.15s;text-align:left;
+}
+.quiz-opt:hover{border-color:var(--blue);color:var(--text);background:var(--blue-dim);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(34,197,94,0.1);color:var(--green);}
+.quiz-opt.wrong{border-color:var(--rose);background:var(--rose-dim);color:var(--rose);}
+
+.formula-input-wrap{display:flex;gap:10px;margin-bottom:12px;}
+.formula-input{
+  flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;color:var(--accent);font-family:var(--mono);font-size:13px;outline:none;
+}
+.formula-input:focus{border-color:var(--accent);}
+.formula-input::placeholder{color:var(--text3);}
+
+.btn{
+  padding:9px 20px;border-radius:8px;border:none;cursor:pointer;
+  font-family:var(--body);font-size:13px;font-weight:600;transition:all 0.15s;
+}
+.btn-accent{background:var(--accent);color:var(--bg);}
+.btn-accent:hover{opacity:0.9;transform:translateY(-1px);}
+.btn-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+
+.result-box{
+  padding:10px 14px;border-radius:8px;font-family:var(--mono);font-size:13px;
+  margin-top:8px;display:none;
+}
+.result-box.show{display:block;}
+.result-box.ok{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:var(--green);}
+.result-box.fail{background:var(--rose-dim);border:1px solid rgba(244,63,94,0.25);color:var(--rose);}
+
+/* AI TUTOR PANEL */
+.ai-panel{
+  width:320px;min-width:320px;
+  background:var(--surface);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.ai-header{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.ai-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--blue));
+  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;
+}
+.ai-name{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);}
+.ai-status{font-family:var(--mono);font-size:10px;color:var(--green);display:flex;align-items:center;gap:4px;}
+.ai-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
+
+.ai-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
+.ai-messages::-webkit-scrollbar{width:3px;}
+.ai-messages::-webkit-scrollbar-thumb{background:var(--border);}
+
+.msg{max-width:90%;font-size:13px;line-height:1.6;}
+.msg-ai{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:4px 12px 12px 12px;padding:10px 13px;color:var(--text2);
+  align-self:flex-start;
+}
+.msg-user{
+  background:var(--accent-dim);border:1px solid rgba(0,229,195,0.2);
+  border-radius:12px 4px 12px 12px;padding:10px 13px;color:var(--accent);
+  align-self:flex-end;font-family:var(--mono);
+}
+.msg-ai code{
+  background:var(--surface3);color:var(--accent);
+  font-family:var(--mono);padding:1px 5px;border-radius:3px;font-size:12px;
+}
+.msg-ai b{color:var(--text);font-weight:600;}
+.msg-typing{
+  display:flex;gap:5px;align-items:center;padding:10px 13px;
+  background:var(--surface2);border:1px solid var(--border);border-radius:4px 12px 12px 12px;
+  align-self:flex-start;
+}
+.msg-typing span{width:7px;height:7px;background:var(--text3);border-radius:50%;animation:blink 1.2s infinite;}
+.msg-typing span:nth-child(2){animation-delay:0.2s;}
+.msg-typing span:nth-child(3){animation-delay:0.4s;}
+@keyframes blink{0%,80%,100%{opacity:0.3;}40%{opacity:1;}}
+
+.ai-input-area{padding:12px 14px;border-top:1px solid var(--border);}
+.ai-input-row{display:flex;gap:8px;}
+.ai-input{
+  flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  padding:9px 12px;color:var(--text);font-family:var(--body);font-size:13px;outline:none;
+  resize:none;
+}
+.ai-input:focus{border-color:var(--accent);}
+.ai-input::placeholder{color:var(--text3);}
+.ai-send{
+  background:var(--accent);color:var(--bg);border:none;border-radius:8px;
+  width:36px;height:36px;cursor:pointer;font-size:16px;transition:all 0.15s;flex-shrink:0;
+}
+.ai-send:hover{opacity:0.85;}
+.ai-hints{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.hint-btn{
+  font-size:11px;font-family:var(--mono);
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text3);padding:4px 10px;border-radius:20px;cursor:pointer;
+  transition:all 0.15s;white-space:nowrap;
+}
+.hint-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* PROGRESS TRACKER */
+.progress-panel{padding:16px;border-top:1px solid var(--border);}
+.progress-label-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:7px;}
+.prog-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:3px;transition:width 0.5s ease;}
+
+/* Sheet simulator */
+.sheet-wrap{overflow-x:auto;margin:14px 0;}
+.sheet-table{border-collapse:collapse;font-family:var(--mono);font-size:12px;}
+.sheet-table th{
+  background:var(--surface3);color:var(--text3);padding:5px 14px;
+  border:1px solid var(--border);font-weight:500;min-width:90px;text-align:center;
+}
+.sheet-table th:first-child{min-width:36px;}
+.sheet-table td{
+  padding:5px 14px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--text);min-width:90px;
+  cursor:default;
+}
+.sheet-table td:first-child{background:var(--surface3);color:var(--text3);text-align:center;}
+.sheet-table td.selected{background:rgba(0,229,195,0.08);border-color:var(--accent);}
+.sheet-table td.formula-cell{color:var(--blue);}
+
+/* animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.fadein{animation:fadeIn 0.3s ease forwards;}
+
+/* scrollbars */
+.lesson-body::-webkit-scrollbar{width:4px;}
+.lesson-body::-webkit-scrollbar-track{background:transparent;}
+.lesson-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* Responsive hide AI on smaller */
+@media(max-width:1100px){.ai-panel{display:none;}}
+@media(max-width:780px){.sidebar{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="logo">Excel<em>Forge</em></div>
+  <div class="topnav-tabs" id="topTabs">
+    <button class="tab-btn active" onclick="switchTab(this,'basics')" ><span class="dot" style="background:#22c55e"></span>Basics</button>
+    <button class="tab-btn" onclick="switchTab(this,'functions')"><span class="dot" style="background:#4f8ef7"></span>Functions</button>
+    <button class="tab-btn" onclick="switchTab(this,'lookup')"><span class="dot" style="background:#a855f7"></span>Lookups</button>
+    <button class="tab-btn" onclick="switchTab(this,'logical')"><span class="dot" style="background:#f5a623"></span>Logical</button>
+    <button class="tab-btn" onclick="switchTab(this,'datetime')"><span class="dot" style="background:#00e5c3"></span>Date &amp; Time</button>
+    <button class="tab-btn" onclick="switchTab(this,'cleaning')"><span class="dot" style="background:#f43f5e"></span>Data Cleaning</button>
+    <button class="tab-btn" onclick="switchTab(this,'pivot')"><span class="dot" style="background:#fb923c"></span>Pivot Tables</button>
+    <button class="tab-btn" onclick="switchTab(this,'charts')"><span class="dot" style="background:#e879f9"></span>Charts &amp; Viz</button>
+    <button class="tab-btn" onclick="switchTab(this,'powerquery')"><span class="dot" style="background:#38bdf8"></span>Power Query</button>
+    <button class="tab-btn" onclick="switchTab(this,'vba')"><span class="dot" style="background:#f43f5e"></span>VBA &amp; Macros</button>
+    <button class="tab-btn" onclick="switchTab(this,'projects')"><span class="dot" style="background:#fbbf24"></span>Real Projects</button>
+  </div>
+  <div class="topnav-right">
+    <span class="xp-badge" id="xpBadge">⚡ 0 XP</span>
+    <span class="streak-badge" id="streakBadge">🔥 0 streak</span>
+  </div>
+</nav>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-search">
+      <input type="text" placeholder="🔍  Search lessons…" id="searchInput" oninput="filterLessons(this.value)">
+    </div>
+    <div class="sidebar-list" id="sidebarList"></div>
+    <div class="progress-panel">
+      <div class="progress-label-row"><span>Overall Progress</span><span id="progressPct">0%</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="lesson-panel">
+      <div class="lesson-header" id="lessonHeader">
+        <div class="lesson-breadcrumb" id="lessonBreadcrumb">Basics → Getting Started</div>
+        <div class="lesson-title" id="lessonTitle">Welcome to ExcelForge</div>
+        <div class="lesson-meta" id="lessonMeta">
+          <span class="meta-pill pill-blue">Beginner</span>
+          <span class="meta-pill pill-green">~5 min</span>
+        </div>
+      </div>
+      <div class="lesson-body" id="lessonBody"></div>
+
+      <!-- PRACTICE -->
+      <div class="practice-panel">
+        <div class="practice-header" onclick="togglePractice()">
+          <div class="practice-header-left">⚡ Practice Exercise</div>
+          <div class="practice-toggle" id="practiceToggle">▲ OPEN</div>
+        </div>
+        <div class="practice-body" id="practiceBody"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- AI TUTOR -->
+  <aside class="ai-panel">
+    <div class="ai-header">
+      <div class="ai-avatar">🤖</div>
+      <div>
+        <div class="ai-name">Excel AI Tutor</div>
+        <div class="ai-status">Online</div>
+      </div>
+    </div>
+    <div class="ai-messages" id="aiMessages"></div>
+    <div class="ai-input-area">
+      <div class="ai-input-row">
+        <textarea class="ai-input" id="aiInput" rows="2" placeholder="Ask anything about Excel…" onkeydown="handleAiKey(event)"></textarea>
+        <button class="ai-send" onclick="sendAiMessage()">➤</button>
+      </div>
+      <div class="ai-hints" id="aiHints"></div>
+    </div>
+  </aside>
+</div>
+
+<script>
+// ─── STATE ───
+let xp = 0, streak = 0, completedLessons = new Set();
+let currentLesson = null, practiceOpen = false;
+
+// ─── CURRICULUM DATA ───
+const curriculum = {
+  basics: {
+    label: "📗 Basics",
+    color: "#22c55e",
+    lessons: [
+      { id:"b1", title:"Excel Interface Tour", time:"3 min", level:"Beginner",
+        theory:`<div class="content-section"><h3>🖥️ The Excel Interface</h3>
+          <p>Excel is organized around a <b>workbook</b> — a file that contains one or more <b>worksheets</b>. Each sheet is a grid of <b>cells</b> referenced by column (A, B, C…) and row (1, 2, 3…).</p>
+          <ul><li><b>Ribbon</b> — tabs like Home, Insert, Formulas, Data</li>
+          <li><b>Name Box</b> — shows the active cell (e.g. A1)</li>
+          <li><b>Formula Bar</b> — shows/edit cell content</li>
+          <li><b>Cell Range</b> — e.g. A1:D10 means from A1 to D10</li></ul>
+          </div>
+          <div class="content-section"><h3>📍 Cell References</h3>
+          <p>Three types of references:</p>
+          <div class="formula-block"><div class="fb-label">RELATIVE</div>=A1+B1 → moves with copy</div>
+          <div class="formula-block"><div class="fb-label">ABSOLUTE</div>=$A$1+$B$1 → stays fixed (use F4)</div>
+          <div class="formula-block"><div class="fb-label">MIXED</div>=$A1 or =A$1 → one part fixed</div>
+          <div class="tip-box"><div class="tip-icon">💡</div>Press <b>F4</b> while editing a cell reference to toggle between absolute and relative.</div>
+          </div>`,
+        practice:{ type:"quiz", q:"Which reference stays fixed when you copy a formula to another cell?",
+          opts:["A1","$A$1","A$1","$A1"], answer:1 }
+      },
+      { id:"b2", title:"SUM, AVERAGE, COUNT", time:"5 min", level:"Beginner",
+        theory:`<div class="content-section"><h3>🧮 The Core Functions Every Analyst Uses Daily</h3>
+          <p>These are the most frequently used functions in data analysis. Master these first.</p>
+          <div class="formula-block"><div class="fb-label">SUM</div>=SUM(A1:A100) → adds all values in range</div>
+          <div class="formula-block"><div class="fb-label">AVERAGE</div>=AVERAGE(B2:B50) → arithmetic mean</div>
+          <div class="formula-block"><div class="fb-label">COUNT</div>=COUNT(C1:C100) → counts numeric cells only</div>
+          <div class="formula-block"><div class="fb-label">COUNTA</div>=COUNTA(C1:C100) → counts non-empty cells (text + numbers)</div>
+          <div class="formula-block"><div class="fb-label">MIN / MAX</div>=MIN(D:D) / =MAX(D:D) → smallest / largest</div>
+          </div>
+          <div class="content-section"><h3>📊 Example Data</h3>
+          <table class="excel-table"><tr><th></th><th>A</th><th>B</th></tr>
+          <tr><td>1</td><td>Sales</td><td>Amount</td></tr>
+          <tr><td>2</td><td>Jan</td><td>45000</td></tr>
+          <tr><td>3</td><td>Feb</td><td>52000</td></tr>
+          <tr><td>4</td><td>Mar</td><td>48000</td></tr>
+          <tr><td>5</td><td class="highlight">Total</td><td class="formula">=SUM(B2:B4)</td></tr></table>
+          <div class="tip-box"><div class="tip-icon">🔥</div>Use <b>AutoSum (Alt+= )</b> to instantly sum a column. One of the most-used shortcuts in Excel!</div></div>`,
+        practice:{ type:"formula", q:"In cell B5, write a formula to get the AVERAGE of B2:B4", answer:"=AVERAGE(B2:B4)", hint:"Start with = then the function name" }
+      },
+      { id:"b3", title:"MIN, MAX, LARGE, SMALL", time:"4 min", level:"Beginner",
+        theory:`<div class="content-section"><h3>📈 Finding Extremes</h3>
+          <p>Beyond MIN and MAX, Excel has powerful ranking functions essential for data analysis.</p>
+          <div class="formula-block"><div class="fb-label">LARGE</div>=LARGE(A:A, 1) → 1st largest, =LARGE(A:A, 3) → 3rd largest</div>
+          <div class="formula-block"><div class="fb-label">SMALL</div>=SMALL(A:A, 2) → 2nd smallest</div>
+          <div class="formula-block"><div class="fb-label">RANK</div>=RANK(A2, A$2:A$10, 0) → rank in descending order</div>
+          <div class="tip-box"><div class="tip-icon">💡</div>RANK 0 = descending (highest=1), RANK 1 = ascending. Always use absolute reference ($) for the range!</div>
+          </div>`,
+        practice:{ type:"quiz", q:"=LARGE(A1:A10, 2) returns the ___?", opts:["Largest value","2nd largest","2nd smallest","Average of top 2"], answer:1 }
+      },
+    ]
+  },
+  functions: {
+    label: "📘 Functions",
+    color: "#4f8ef7",
+    lessons: [
+      { id:"f1", title:"SUMIF & SUMIFS", time:"6 min", level:"Intermediate",
+        theory:`<div class="content-section"><h3>🎯 Conditional Summing — A Data Analyst's Best Friend</h3>
+          <p>SUMIF adds values that meet <b>one condition</b>. SUMIFS handles <b>multiple conditions</b>.</p>
+          <div class="formula-block"><div class="fb-label">SUMIF SYNTAX</div>=SUMIF(range, criteria, sum_range)</div>
+          <div class="formula-block"><div class="fb-label">EXAMPLE</div>=SUMIF(B:B, "North", C:C) → sums column C where B = "North"</div>
+          <div class="formula-block"><div class="fb-label">SUMIFS SYNTAX</div>=SUMIFS(sum_range, range1, crit1, range2, crit2, …)</div>
+          <div class="formula-block"><div class="fb-label">EXAMPLE</div>=SUMIFS(C:C, B:B,"North", D:D,">1000")</div>
+          <table class="excel-table"><tr><th></th><th>A</th><th>B</th><th>C</th></tr>
+          <tr><td>1</td><td>Product</td><td>Region</td><td>Sales</td></tr>
+          <tr><td>2</td><td>Widget</td><td>North</td><td>5000</td></tr>
+          <tr><td>3</td><td>Gadget</td><td>South</td><td>3000</td></tr>
+          <tr><td>4</td><td>Widget</td><td>North</td><td>4500</td></tr>
+          <tr><td>5</td><td class="formula" colspan="2">=SUMIF(B2:B4,"North",C2:C4)</td><td class="highlight">9500</td></tr></table>
+          <div class="tip-box"><div class="tip-icon">🔥</div>Use wildcards in criteria: <code>"North*"</code> matches anything starting with "North". Use <code>">"&E1</code> to reference a cell as criteria.</div></div>`,
+        practice:{ type:"formula", q:"Sum column C where column A = \"Widget\" (data in rows 2:100)", answer:"=SUMIF(A2:A100,\"Widget\",C2:C100)", hint:"SUMIF(range, criteria, sum_range)" }
+      },
+      { id:"f2", title:"COUNTIF & COUNTIFS", time:"5 min", level:"Intermediate",
+        theory:`<div class="content-section"><h3>🔢 Counting with Conditions</h3>
+          <div class="formula-block"><div class="fb-label">COUNTIF</div>=COUNTIF(A:A, "Completed") → count cells equal to "Completed"</div>
+          <div class="formula-block"><div class="fb-label">COUNTIF with comparison</div>=COUNTIF(B:B, ">500") → count values above 500</div>
+          <div class="formula-block"><div class="fb-label">COUNTIFS (multiple)</div>=COUNTIFS(A:A,"Q1", B:B,"North") → count rows matching both</div>
+          <div class="tip-box"><div class="tip-icon">💡</div>For partial match: =COUNTIF(A:A,"*apple*") counts any cell containing "apple". Case-insensitive!</div></div>`,
+        practice:{ type:"formula", q:"Count how many cells in B2:B50 have value greater than 1000", answer:"=COUNTIF(B2:B50,\">1000\")", hint:"Use comparison operator in quotes" }
+      },
+      { id:"f3", title:"TEXT Functions", time:"6 min", level:"Intermediate",
+        theory:`<div class="content-section"><h3>✂️ Text Manipulation — Data Cleaning Essentials</h3>
+          <div class="formula-block"><div class="fb-label">LEFT / RIGHT / MID</div>=LEFT(A2, 3) → first 3 characters
+=RIGHT(A2, 4) → last 4 characters
+=MID(A2, 3, 5) → 5 chars starting at position 3</div>
+          <div class="formula-block"><div class="fb-label">LEN / FIND / SEARCH</div>=LEN(A2) → character count
+=FIND("@",A2) → position of @, case-sensitive
+=SEARCH("name",A2) → position, case-insensitive</div>
+          <div class="formula-block"><div class="fb-label">CONCATENATE / &</div>=A2&" "&B2 → joins text (use & operator, faster!)
+=CONCAT(A2:A10) → joins a range</div>
+          <div class="formula-block"><div class="fb-label">UPPER / LOWER / PROPER</div>=PROPER("john smith") → "John Smith"</div>
+          <div class="formula-block"><div class="fb-label">TRIM / CLEAN</div>=TRIM(A2) → removes extra spaces
+=CLEAN(A2) → removes non-printable characters</div>
+          <div class="tip-box"><div class="tip-icon">🔥</div>Extract email domain: =MID(A2, FIND("@",A2)+1, LEN(A2)) — a real analyst trick!</div></div>`,
+        practice:{ type:"formula", q:"Extract first name (left 4 chars) from cell A2", answer:"=LEFT(A2,4)", hint:"=LEFT(cell, number_of_chars)" }
+      },
+    ]
+  },
+  lookup: {
+    label: "🔍 Lookups",
+    color: "#a855f7",
+    lessons: [
+      { id:"l1", title:"VLOOKUP Deep Dive", time:"8 min", level:"Intermediate",
+        theory:`<div class="content-section"><h3>🔍 VLOOKUP — The Classic Lookup</h3>
+          <p>VLOOKUP searches for a value in the <b>first column</b> of a table, then returns a value from a specified column.</p>
+          <div class="formula-block"><div class="fb-label">SYNTAX</div>=VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup])</div>
+          <table class="excel-table"><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+          <tr><td>1</td><td>EmpID</td><td>Name</td><td>Dept</td><td>Salary</td></tr>
+          <tr><td>2</td><td>101</td><td>Arjun</td><td>Sales</td><td>45000</td></tr>
+          <tr><td>3</td><td>102</td><td>Priya</td><td>IT</td><td>62000</td></tr>
+          <tr><td>4</td><td>103</td><td>Rahul</td><td>HR</td><td>38000</td></tr></table>
+          <div class="formula-block"><div class="fb-label">FIND SALARY FOR EMP 102</div>=VLOOKUP(102, A2:D4, 4, FALSE) → 62000</div>
+          <p style="color:var(--text2);font-size:14px;margin-top:12px;">Parameters:<br>
+          • <b>lookup_value</b>: what to search (102)<br>
+          • <b>table_array</b>: the entire table (A2:D4)<br>
+          • <b>col_index_num</b>: which column to return (4 = Salary)<br>
+          • <b>range_lookup</b>: FALSE = exact match (always use FALSE!)</p>
+          <div class="tip-box"><div class="tip-icon">⚠️</div><b>VLOOKUP limitations:</b> Can only look left-to-right. Breaks if you insert columns. For modern Excel, use XLOOKUP instead!</div></div>`,
+        practice:{ type:"formula", q:"Look up Name (col 2) for EmpID in F2, from table A2:D100", answer:"=VLOOKUP(F2,A2:D100,2,FALSE)", hint:"4th arg = FALSE for exact match" }
+      },
+      { id:"l2", title:"INDEX + MATCH (Must Know 🔥)", time:"8 min", level:"Advanced",
+        theory:`<div class="content-section"><h3>💪 INDEX + MATCH — The Power Combination</h3>
+          <p>INDEX+MATCH is more flexible than VLOOKUP. It can look <b>left, right, up, down</b> and doesn't break when columns are inserted.</p>
+          <div class="formula-block"><div class="fb-label">INDEX SYNTAX</div>=INDEX(return_range, row_number) → returns value at row</div>
+          <div class="formula-block"><div class="fb-label">MATCH SYNTAX</div>=MATCH(lookup_value, lookup_range, 0) → returns position (0=exact)</div>
+          <div class="formula-block"><div class="fb-label">COMBINED</div>=INDEX(return_col, MATCH(lookup_val, lookup_col, 0))</div>
+          <div class="formula-block"><div class="fb-label">REAL EXAMPLE</div>=INDEX(D2:D100, MATCH(F2, A2:A100, 0))
+→ Find salary where EmpID = F2</div>
+          <div class="tip-box"><div class="tip-icon">🔥</div>INDEX+MATCH works both ways — you can look up by any column and return any column. <b>This is what senior analysts use.</b></div>
+          <div class="content-section"><h3>🆕 XLOOKUP (Modern Excel)</h3>
+          <div class="formula-block"><div class="fb-label">XLOOKUP</div>=XLOOKUP(F2, A2:A100, D2:D100, "Not Found")
+→ Find salary, return "Not Found" if missing</div>
+          <p style="color:var(--text2);font-size:14px;">XLOOKUP is cleaner and handles errors natively. Use it if your Excel version supports it (Office 365+).</p></div>`,
+        practice:{ type:"formula", q:"Use INDEX+MATCH to find Dept (col C2:C100) where EmpID (A2:A100) = F2", answer:"=INDEX(C2:C100,MATCH(F2,A2:A100,0))", hint:"INDEX(return_range, MATCH(…))" }
+      },
+      { id:"l3", title:"HLOOKUP & 2D Lookup", time:"5 min", level:"Intermediate",
+        theory:`<div class="content-section"><h3>↔️ HLOOKUP — Horizontal Lookup</h3>
+          <p>HLOOKUP searches across the <b>first row</b> of a table (instead of first column like VLOOKUP).</p>
+          <div class="formula-block"><div class="fb-label">SYNTAX</div>=HLOOKUP(lookup_value, table_array, row_index_num, FALSE)</div>
+          <div class="content-section"><h3>📐 2D Lookup (Row + Column)</h3>
+          <div class="formula-block"><div class="fb-label">2D LOOKUP</div>=INDEX(B2:E5, MATCH(H2,A2:A5,0), MATCH(H3,B1:E1,0))
+→ Find value at intersection of row match and column match</div>
+          <div class="tip-box"><div class="tip-icon">💡</div>2D lookup is extremely powerful for lookup tables (e.g., find price for a specific product in a specific month).</div></div>`,
+        practice:{ type:"quiz", q:"HLOOKUP searches the lookup value in the ___ of the table?", opts:["First column","Last row","First row","Any column"], answer:2 }
+      },
+    ]
+  },
+  logical: {
+    label: "🧮 Logical",
+    color: "#f5a623",
+    lessons: [
+      { id:"lg1", title:"IF, IFS, NESTED IF", time:"7 min", level:"Intermediate",
+        theory:`<div class="content-section"><h3>🔀 Logical Functions — Decision Making in Cells</h3>
+          <div class="formula-block"><div class="fb-label">IF SYNTAX</div>=IF(condition, value_if_true, value_if_false)</div>
+          <div class="formula-block"><div class="fb-label">EXAMPLE</div>=IF(B2>=50000, "Senior", "Junior") → classify by salary</div>
+          <div class="formula-block"><div class="fb-label">NESTED IF</div>=IF(B2>=80,"A", IF(B2>=60,"B", IF(B2>=40,"C","D")))</div>
+          <div class="formula-block"><div class="fb-label">IFS (cleaner)</div>=IFS(B2>=80,"A", B2>=60,"B", B2>=40,"C", TRUE,"D")</div>
+          <div class="tip-box"><div class="tip-icon">💡</div>Max 64 nested IFs allowed (don't go beyond 3–4). Use IFS() for better readability.</div></div>`,
+        practice:{ type:"formula", q:"Flag B2 as 'High' if >10000, else 'Low'", answer:"=IF(B2>10000,\"High\",\"Low\")", hint:"=IF(condition, true_val, false_val)" }
+      },
+      { id:"lg2", title:"AND, OR, NOT", time:"5 min", level:"Intermediate",
+        theory:`<div class="content-section"><h3>⚡ Combining Conditions</h3>
+          <div class="formula-block"><div class="fb-label">AND</div>=IF(AND(B2>50000, C2="Sales"), "Bonus", "No")
+→ Both conditions must be true</div>
+          <div class="formula-block"><div class="fb-label">OR</div>=IF(OR(C2="HR", C2="Finance"), "Admin", "Field")
+→ At least one condition must be true</div>
+          <div class="formula-block"><div class="fb-label">NOT</div>=IF(NOT(C2="Intern"), "Eligible", "Not Eligible")</div>
+          <div class="formula-block"><div class="fb-label">IFERROR</div>=IFERROR(VLOOKUP(F2,A:D,4,0), "Not Found")
+→ Handle errors gracefully (interview favorite!)</div>
+          <div class="tip-box"><div class="tip-icon">🔥</div>IFERROR is a must-know — wrap any formula that might produce an error to avoid #N/A, #DIV/0! etc.</div></div>`,
+        practice:{ type:"formula", q:"Return 'Top Performer' if B2>90 AND C2='Sales', else 'Normal'", answer:"=IF(AND(B2>90,C2=\"Sales\"),\"Top Performer\",\"Normal\")", hint:"Combine IF with AND()" }
+      },
+    ]
+  },
+  datetime: {
+    label: "📅 Date & Time",
+    color: "#00e5c3",
+    lessons: [
+      { id:"dt1", title:"Date Functions", time:"6 min", level:"Intermediate",
+        theory:`<div class="content-section"><h3>📅 Working With Dates — Time-Based Analysis</h3>
+          <div class="formula-block"><div class="fb-label">TODAY / NOW</div>=TODAY() → current date (updates daily)
+=NOW() → current date and time</div>
+          <div class="formula-block"><div class="fb-label">DATE PARTS</div>=YEAR(A2) → extracts year
+=MONTH(A2) → extracts month (1–12)
+=DAY(A2) → extracts day
+=WEEKDAY(A2, 2) → day of week (2=Mon start)</div>
+          <div class="formula-block"><div class="fb-label">DATEDIF</div>=DATEDIF(A2, B2, "D") → days between dates
+=DATEDIF(A2, TODAY(), "M") → months since date
+=DATEDIF(A2, TODAY(), "Y") → years (calculate age!)</div>
+          <div class="formula-block"><div class="fb-label">EOMONTH</div>=EOMONTH(TODAY(), 0) → last day of current month
+=EOMONTH(TODAY(), 1) → last day of next month</div>
+          <div class="formula-block"><div class="fb-label">NETWORKDAYS</div>=NETWORKDAYS(A2, B2) → working days between dates
+=NETWORKDAYS.INTL(A2,B2,1,holidays) → custom weekends</div>
+          <div class="tip-box"><div class="tip-icon">💡</div>DATEDIF is a hidden function — no IntelliSense shows it, but it works! "D"=days, "M"=months, "Y"=years.</div></div>`,
+        practice:{ type:"formula", q:"Calculate age in years from birthdate in A2 to today", answer:"=DATEDIF(A2,TODAY(),\"Y\")", hint:"DATEDIF(start, end, unit)" }
+      },
+      { id:"dt2", title:"TEXT & DATEVALUE", time:"4 min", level:"Intermediate",
+        theory:`<div class="content-section"><h3>🔄 Converting Dates</h3>
+          <div class="formula-block"><div class="fb-label">TEXT function</div>=TEXT(A2,"MMM YYYY") → "Jan 2024"
+=TEXT(A2,"DD-MMM-YY") → "15-Jan-24"
+=TEXT(A2,"DDDD") → "Monday"</div>
+          <div class="formula-block"><div class="fb-label">DATEVALUE</div>=DATEVALUE("2024-01-15") → converts text to date serial</div>
+          <div class="formula-block"><div class="fb-label">EDATE</div>=EDATE(A2, 3) → date 3 months from A2 (great for deadlines)</div>
+          <div class="tip-box"><div class="tip-icon">🔥</div>When dates come from a database as text strings, use DATEVALUE to convert them. Then format as dates!</div></div>`,
+        practice:{ type:"quiz", q:"=TEXT(A2, \"MMMM\") returns the ___?", opts:["Month number","Full month name","Short month name","Year"], answer:1 }
+      },
+    ]
+  },
+  cleaning: {
+    label: "🧹 Data Cleaning",
+    color: "#f43f5e",
+    lessons: [
+      { id:"dc1", title:"TRIM, CLEAN, SUBSTITUTE", time:"5 min", level:"Intermediate",
+        theory:`<div class="content-section"><h3>🧹 Data Cleaning — The Most Underrated Skill</h3>
+          <p>80% of an analyst's time is spent cleaning data. These functions are essential.</p>
+          <div class="formula-block"><div class="fb-label">TRIM</div>=TRIM(A2) → removes leading, trailing, extra spaces</div>
+          <div class="formula-block"><div class="fb-label">CLEAN</div>=CLEAN(A2) → removes non-printable characters (from CSV imports)</div>
+          <div class="formula-block"><div class="fb-label">SUBSTITUTE</div>=SUBSTITUTE(A2, "-", "") → removes dashes
+=SUBSTITUTE(A2, " ", "_") → replace spaces with underscores</div>
+          <div class="formula-block"><div class="fb-label">REPLACE</div>=REPLACE(A2, 1, 3, "XXX") → replace 3 chars from position 1</div>
+          <div class="formula-block"><div class="fb-label">VALUE</div>=VALUE(TRIM(A2)) → converts text-stored numbers to actual numbers</div>
+          <div class="tip-box"><div class="tip-icon">🔥</div>Combine them: =VALUE(TRIM(CLEAN(A2))) — the ultimate data cleaning combo for messy imports!</div></div>`,
+        practice:{ type:"formula", q:"Remove all spaces from cell A2 using SUBSTITUTE", answer:"=SUBSTITUTE(A2,\" \",\"\")", hint:"Replace space with empty string" }
+      },
+      { id:"dc2", title:"Remove Duplicates & Flash Fill", time:"4 min", level:"Beginner",
+        theory:`<div class="content-section"><h3>🗑️ Deduplication & Smart Fill</h3>
+          <p><b>Remove Duplicates:</b> Data tab → Remove Duplicates → Select columns</p>
+          <p style="margin-top:10px;"><b>COUNTIF for duplicates:</b></p>
+          <div class="formula-block"><div class="fb-label">FLAG DUPLICATES</div>=COUNTIF($A$2:A2, A2)>1 → TRUE if duplicate (use as helper column)</div>
+          <div class="formula-block"><div class="fb-label">UNIQUE (Excel 365)</div>=UNIQUE(A2:A100) → spills unique values dynamically!</div>
+          <p style="color:var(--text2);font-size:14px;margin-top:14px;"><b>Flash Fill (Ctrl+E):</b> Excel detects a pattern from your examples and fills the rest automatically. Perfect for splitting full names, formatting phone numbers, etc.</p>
+          <div class="tip-box"><div class="tip-icon">💡</div>Flash Fill is magic for one-time transforms. For repeatable cleaning, use formulas so it auto-updates.</div></div>`,
+        practice:{ type:"quiz", q:"What keyboard shortcut triggers Flash Fill?", opts:["Ctrl+F","Ctrl+E","Alt+D","Ctrl+D"], answer:1 }
+      },
+    ]
+  },
+  pivot: {
+    label: "📊 Pivot Tables",
+    color: "#fb923c",
+    lessons: [
+      { id:"p1", title:"Create Your First Pivot", time:"8 min", level:"Intermediate",
+        theory:`<div class="content-section"><h3>📊 Pivot Tables — The Analyst's Swiss Army Knife</h3>
+          <p>Pivot tables let you summarize thousands of rows in seconds without writing a single formula.</p>
+          <p style="margin-top:10px;"><b>How to create:</b> Insert → PivotTable → Select range → OK</p>
+          <p style="margin-top:10px;"><b>The 4 areas:</b></p>
+          <ul>
+            <li><b>Filters</b> — filter the entire pivot (like a global filter)</li>
+            <li><b>Columns</b> — data spread across columns</li>
+            <li><b>Rows</b> — categories down the left</li>
+            <li><b>Values</b> — what you're measuring (SUM, COUNT, AVG etc.)</li>
+          </ul>
+          <div class="tip-box"><div class="tip-icon">🔥</div>Right-click a value → Show Values As → % of Column Total — instant percent distribution! Great for interviews.</div>
+          </div>
+          <div class="content-section"><h3>⚙️ Value Field Settings</h3>
+          <p>Right-click any value → Value Field Settings to change aggregation:</p>
+          <ul><li>Sum, Count, Average, Max, Min</li><li>% of Grand Total, % of Column Total</li><li>Running Total, Rank</li></ul>
+          </div>
+          <div class="content-section"><h3>🎛️ Slicers</h3>
+          <p>Insert → Slicer → Choose field → Click to filter visually. Connect one slicer to multiple pivot tables! Perfect for dashboards.</p></div>`,
+        practice:{ type:"quiz", q:"Where do you drag a field to count rows in a Pivot Table?", opts:["Rows area","Columns area","Values area","Filters area"], answer:2 }
+      },
+      { id:"p2", title:"Pivot Grouping & Calculated Fields", time:"6 min", level:"Advanced",
+        theory:`<div class="content-section"><h3>📅 Grouping Dates in Pivot Tables</h3>
+          <p>Right-click a date field in rows → Group → Select: Days, Months, Quarters, Years</p>
+          <div class="tip-box"><div class="tip-icon">💡</div>Grouping by Quarter+Year automatically lets you do quarterly trend analysis in seconds!</div>
+          </div>
+          <div class="content-section"><h3>➕ Calculated Fields</h3>
+          <p>PivotTable Analyze tab → Fields, Items & Sets → Calculated Field</p>
+          <div class="formula-block"><div class="fb-label">EXAMPLE</div>Name: Profit Margin
+Formula: = Profit / Revenue</div>
+          <p style="color:var(--text2);font-size:14px;margin-top:10px;">Calculated fields let you create new metrics (like margin %, growth %) directly in the pivot without modifying source data.</p>
+          </div>`,
+        practice:{ type:"quiz", q:"To add a custom metric like 'Profit Margin' to a pivot, you use?", opts:["Add a formula column","Calculated Field","Grouping","GETPIVOTDATA"], answer:1 }
+      },
+    ]
+  },
+  charts: {
+    label: "📈 Charts & Viz",
+    color: "#e879f9",
+    lessons: [
+      { id:"ch1", title:"Chart Types & When to Use", time:"6 min", level:"Intermediate",
+        theory:`<div class="content-section"><h3>📈 Choosing the Right Chart</h3>
+          <ul>
+            <li><b>Bar/Column</b> — compare categories (most used in interviews)</li>
+            <li><b>Line</b> — trends over time</li>
+            <li><b>Pie/Donut</b> — part-to-whole (use sparingly, max 5 segments)</li>
+            <li><b>Scatter</b> — correlation between two variables</li>
+            <li><b>Waterfall</b> — show cumulative effect (budget variance)</li>
+            <li><b>Combo</b> — bars + line (e.g., sales bars + growth % line)</li>
+          </ul>
+          <div class="tip-box"><div class="tip-icon">🔥</div>Combo chart = secondary axis. Right-click a series → Format → Secondary Axis. Perfect for mixing volume and percentage!</div>
+          </div>
+          <div class="content-section"><h3>🎨 Conditional Formatting</h3>
+          <div class="formula-block"><div class="fb-label">TOP 10 / BOTTOM 10</div>Home → Conditional Formatting → Top/Bottom Rules</div>
+          <div class="formula-block"><div class="fb-label">DATA BARS</div>Home → Conditional Formatting → Data Bars → in-cell bar charts!</div>
+          <div class="formula-block"><div class="fb-label">COLOR SCALES</div>Home → Conditional Formatting → Color Scales → heatmap</div>
+          <div class="formula-block"><div class="fb-label">CUSTOM RULE</div>=B2&lt;AVERAGE($B$2:$B$100) → highlight below-average cells</div></div>`,
+        practice:{ type:"quiz", q:"Which chart type is best for showing trends over time?", opts:["Pie chart","Bar chart","Line chart","Scatter plot"], answer:2 }
+      },
+      { id:"ch2", title:"Building Dashboards", time:"10 min", level:"Advanced",
+        theory:`<div class="content-section"><h3>🖥️ Dashboard Design Principles</h3>
+          <ul>
+            <li>Use a dedicated <b>Data sheet</b> (raw data) and <b>Dashboard sheet</b> (visuals)</li>
+            <li>Link charts to the data sheet — never embed data in the dashboard</li>
+            <li>Use <b>Named Ranges</b> for dynamic references</li>
+            <li>Add <b>Slicers</b> for interactive filtering</li>
+            <li>Use <b>Sparklines</b> (Insert → Sparklines) for in-cell mini charts</li>
+          </ul>
+          <div class="content-section"><h3>📌 KPI Cards</h3>
+          <p>Create KPI cards with large numbers: merge cells, use big font, add an arrow icon with conditional formatting (▲▼) using =IF(B2>B3,"▲","▼")</p></div>
+          <div class="tip-box"><div class="tip-icon">🔥</div>Camera Tool (Quick Access Toolbar) → takes a live snapshot of cells — perfect for dashboard layouts where you want a chart + table in one view!</div></div>`,
+        practice:{ type:"quiz", q:"To make a slicer filter multiple pivot tables, you must ___?", opts:["Copy it","Use Report Connections","Link them","Use GETPIVOTDATA"], answer:1 }
+      },
+    ]
+  },
+  powerquery: {
+    label: "⚡ Power Query",
+    color: "#38bdf8",
+    lessons: [
+      { id:"pq1", title:"Power Query Introduction", time:"8 min", level:"Advanced",
+        theory:`<div class="content-section"><h3>⚡ Power Query — The Future of Data Transformation</h3>
+          <p>Power Query (Get & Transform) lets you connect, clean, and transform data <b>without formulas</b>. Every step is recorded and can be refreshed with one click.</p>
+          <p style="margin-top:10px;"><b>Access:</b> Data tab → Get Data (or Data → From Table/Range)</p>
+          <p style="margin-top:14px;"><b>Key operations:</b></p>
+          <ul>
+            <li><b>Remove Columns</b> — drop what you don't need</li>
+            <li><b>Filter Rows</b> — keep only relevant data</li>
+            <li><b>Split Column</b> — by delimiter, by # of characters</li>
+            <li><b>Merge Queries</b> — like a SQL JOIN (Left, Right, Inner, Full)</li>
+            <li><b>Append Queries</b> — stack tables vertically (like UNION)</li>
+            <li><b>Pivot/Unpivot</b> — reshape wide to tall or vice versa</li>
+            <li><b>Group By</b> — aggregate like a pivot but stays in Power Query</li>
+            <li><b>Custom Column</b> — write M language expressions</li>
+          </ul>
+          <div class="tip-box"><div class="tip-icon">🔥</div>Unpivot Columns = the most powerful reshape tool. Turns wide data (month columns) into tall data (single Month column) — essential for charting!</div>
+          </div>
+          <div class="content-section"><h3>🔄 Refresh</h3>
+          <p>Data → Refresh All — all your transforms re-run on the new data. <b>Zero manual work once set up.</b> This is what makes analysts 10x faster.</p></div>`,
+        practice:{ type:"quiz", q:"Power Query 'Append' operation is similar to SQL ___?", opts:["JOIN","UNION","WHERE","GROUP BY"], answer:1 }
+      },
+      { id:"pq2", title:"M Language Basics", time:"6 min", level:"Advanced",
+        theory:`<div class="content-section"><h3>🖥️ M Language — Power Query Under the Hood</h3>
+          <p>Every Power Query step generates M code. You can view/edit it via Advanced Editor.</p>
+          <div class="formula-block"><div class="fb-label">SAMPLE M CODE</div>let
+  Source = Excel.CurrentWorkbook(){[Name="SalesData"]}[Content],
+  FilteredRows = Table.SelectRows(Source, each [Revenue] > 1000),
+  AddedColumn = Table.AddColumn(FilteredRows, "Margin", each [Profit]/[Revenue])
+in
+  AddedColumn</div>
+          <p style="color:var(--text2);font-size:14px;margin-top:10px;">Each step is a variable. The last variable after <code>in</code> is the output.</p>
+          <div class="tip-box"><div class="tip-icon">💡</div>You don't need to be an M expert — the GUI generates 90% of the code. But knowing M lets you fix edge cases and write custom logic.</div></div>`,
+        practice:{ type:"quiz", q:"In Power Query, what does 'each' keyword mean?", opts:["Filter rows","Repeat for each row","Group by","Add column"], answer:1 }
+      },
+    ]
+  },
+  vba: {
+    label: "🤖 VBA & Macros",
+    color: "#f43f5e",
+    lessons: [
+      { id:"v1", title:"Record & Edit Macros", time:"8 min", level:"Advanced",
+        theory:`<div class="content-section"><h3>🤖 VBA & Macros — Automation for Analysts</h3>
+          <p><b>Macro</b> = recorded sequence of actions. <b>VBA</b> = the code behind macros (Visual Basic for Applications).</p>
+          <p style="margin-top:10px;"><b>Record a Macro:</b> View → Macros → Record Macro → Do actions → Stop</p>
+          <p style="margin-top:10px;"><b>Access VBA Editor:</b> Alt+F11</p>
+          </div>
+          <div class="content-section"><h3>📝 Basic VBA Syntax</h3>
+          <div class="formula-block"><div class="fb-label">HELLO WORLD</div>Sub HelloWorld()
+    MsgBox "Hello, Data Analyst!"
+End Sub</div>
+          <div class="formula-block"><div class="fb-label">WRITE TO CELL</div>Sub WriteToCell()
+    Range("A1").Value = "ExcelForge"
+    Cells(2, 1).Value = 42      ' Row 2, Col 1
+End Sub</div>
+          <div class="formula-block"><div class="fb-label">LOOP THROUGH ROWS</div>Sub LoopRows()
+    Dim i As Long
+    For i = 2 To 100
+        If Cells(i, 3).Value > 1000 Then
+            Cells(i, 4).Value = "High"
+        End If
+    Next i
+End Sub</div>
+          <div class="tip-box"><div class="tip-icon">🔥</div>Save as .xlsm (Macro-Enabled Workbook) to preserve your VBA code. Regular .xlsx strips all macros!</div></div>`,
+        practice:{ type:"quiz", q:"What file extension saves an Excel file with macros?", opts:[".xlsx",".xlsb",".xlsm",".xltx"], answer:2 }
+      },
+      { id:"v2", title:"Useful VBA for Analysts", time:"7 min", level:"Advanced",
+        theory:`<div class="content-section"><h3>⚡ VBA Patterns Every Analyst Should Know</h3>
+          <div class="formula-block"><div class="fb-label">AUTO-FORMAT REPORT</div>Sub FormatReport()
+    Dim ws As Worksheet
+    Set ws = Sheets("Report")
+    With ws.Range("A1:G1")
+        .Font.Bold = True
+        .Interior.Color = RGB(0, 112, 192)
+        .Font.Color = RGB(255,255,255)
+    End With
+    ws.Columns.AutoFit
+End Sub</div>
+          <div class="formula-block"><div class="fb-label">EXPORT EACH SHEET AS PDF</div>Sub ExportPDF()
+    Dim ws As Worksheet
+    For Each ws In Worksheets
+        ws.ExportAsFixedFormat xlTypePDF, "C:\Reports\" & ws.Name & ".pdf"
+    Next ws
+End Sub</div>
+          <div class="formula-block"><div class="fb-label">REFRESH ALL PIVOTS</div>Sub RefreshPivots()
+    Dim pt As PivotTable
+    For Each pt In ActiveSheet.PivotTables
+        pt.RefreshTable
+    Next pt
+End Sub</div>
+          <div class="tip-box"><div class="tip-icon">💡</div>Assign macros to buttons: Developer tab → Insert → Button → assign macro. Turn your workbook into a mini app!</div></div>`,
+        practice:{ type:"quiz", q:"In VBA, which keyword is used to declare a variable?", opts:["Let","Set","Dim","Var"], answer:2 }
+      },
+    ]
+  },
+  projects: {
+    label: "🏆 Real Projects",
+    color: "#fbbf24",
+    lessons: [
+      { id:"pr1", title:"Sales Dashboard Project", time:"15 min", level:"Advanced",
+        theory:`<div class="content-section"><h3>🏆 Project: Sales Performance Dashboard</h3>
+          <p>This is the most common interview task for Data Analysts. Build it step by step.</p>
+          <p style="margin-top:12px;"><b>Dataset:</b> Sales transactions with: Date, Region, Salesperson, Product, Revenue, Cost, Units</p>
+          <p style="margin-top:12px;"><b>Step 1 — Prep the data:</b></p>
+          <ul><li>Add helper columns: Profit = Revenue-Cost, Margin% = Profit/Revenue</li><li>Add Month column: =TEXT(Date,"MMM-YY")</li><li>Format as Table (Ctrl+T) for auto-expansion</li></ul>
+          <p style="margin-top:12px;"><b>Step 2 — Pivot Tables:</b></p>
+          <ul><li>Revenue by Region (bar chart)</li><li>Monthly Revenue Trend (line chart)</li><li>Top 5 Salesperson (bar chart)</li><li>Product Mix (donut chart)</li></ul>
+          <p style="margin-top:12px;"><b>Step 3 — Dashboard Layout:</b></p>
+          <ul><li>KPI cards: Total Revenue, Total Profit, Avg Margin, # Transactions</li><li>Add slicers: Region, Month, Product</li><li>Connect slicers to all pivots (Report Connections)</li></ul>
+          <div class="tip-box"><div class="tip-icon">🔥</div>This exact dashboard has been asked in interviews at top companies. Practice building it from scratch in under 30 minutes!</div></div>`,
+        practice:{ type:"quiz", q:"What Excel feature allows one slicer to control multiple pivot tables?", opts:["PivotTable Connection","Report Connections","Slicer Link","Data Validation"], answer:1 }
+      },
+      { id:"pr2", title:"Budget vs Actual Analysis", time:"12 min", level:"Advanced",
+        theory:`<div class="content-section"><h3>📊 Project: Budget vs Actual Comparison</h3>
+          <p>A classic financial analysis task. Common in Data Analyst and Finance Analyst interviews.</p>
+          <div class="formula-block"><div class="fb-label">VARIANCE</div>= Actual - Budget</div>
+          <div class="formula-block"><div class="fb-label">VARIANCE %</div>= (Actual - Budget) / Budget</div>
+          <div class="formula-block"><div class="fb-label">STATUS FLAG</div>=IF(Variance>0,"✅ Over","❌ Under")</div>
+          <div class="formula-block"><div class="fb-label">DYNAMIC LABEL</div>=TEXT(ABS(Variance/Budget),"0.0%")&IF(Variance>0," over"," under")&" budget"</div>
+          <p style="color:var(--text2);font-size:14px;margin-top:14px;"><b>Visualization:</b> Use a Waterfall chart to show cumulative variance. Conditional Formatting on variance column: red for under, green for over.</p>
+          <div class="tip-box"><div class="tip-icon">💡</div>Always show both absolute (₹ amount) and relative (%) variance. Executives want both — a 10% miss on a ₹10L budget is more meaningful than a 0.1% miss on ₹1Cr.</div></div>`,
+        practice:{ type:"formula", q:"Calculate variance % where Actual is B2 and Budget is C2", answer:"=(B2-C2)/C2", hint:"Divide difference by budget" }
+      },
+      { id:"pr3", title:"Data Cleaning Pipeline", time:"10 min", level:"Advanced",
+        theory:`<div class="content-section"><h3>🧹 Project: Full Data Cleaning Workflow</h3>
+          <p>A structured approach to cleaning messy data — used in every real analyst project.</p>
+          <p style="margin-top:12px;"><b>The 7-Step Cleaning Checklist:</b></p>
+          <ul>
+            <li>1️⃣ <b>Remove duplicates</b> — Data → Remove Duplicates</li>
+            <li>2️⃣ <b>Fix text</b> — =TRIM(PROPER(CLEAN(A2)))</li>
+            <li>3️⃣ <b>Standardize dates</b> — =DATEVALUE(TRIM(A2))</li>
+            <li>4️⃣ <b>Convert text-numbers</b> — =VALUE(TRIM(A2))</li>
+            <li>5️⃣ <b>Handle blanks</b> — =IF(A2="","Unknown",A2) or use Go To Special → Blanks</li>
+            <li>6️⃣ <b>Validate</b> — COUNTIF to check for unexpected values</li>
+            <li>7️⃣ <b>Document</b> — keep a change log in a separate sheet</li>
+          </ul>
+          <div class="tip-box"><div class="tip-icon">🔥</div>In interviews, when given raw data, <b>always check for duplicates, blanks, and data types FIRST</b> before any analysis. This shows analytical maturity!</div></div>`,
+        practice:{ type:"quiz", q:"Which function removes both leading AND trailing spaces?", opts:["CLEAN","SUBSTITUTE","TRIM","LEFT"], answer:2 }
+      },
+    ]
+  }
+};
+
+// ─── FLATTEN LESSONS ───
+let allLessons = [];
+Object.entries(curriculum).forEach(([cat, data]) => {
+  data.lessons.forEach(l => { l.category = cat; allLessons.push(l); });
+});
+
+// ─── HINTS PER CATEGORY ───
+const aiHints = {
+  basics: ["What is a cell reference?","How do I freeze rows?","Explain AutoSum"],
+  functions: ["Difference SUMIF vs SUMIFS?","How to count unique values?","Explain volatile functions"],
+  lookup: ["VLOOKUP vs XLOOKUP?","How to do a 2-way lookup?","Why INDEX MATCH is better?"],
+  logical: ["Nested IF best practice?","IFERROR vs IFNA?","How to use IFS?"],
+  datetime: ["Calculate working days?","Difference DATEDIF units?","How to get quarter from date?"],
+  cleaning: ["Handle #N/A errors?","Convert text dates?","Find & replace tips?"],
+  pivot: ["Pivot table not updating?","How to add calculated field?","Group by month in pivot?"],
+  charts: ["Best chart for comparison?","Secondary axis how-to?","Dynamic chart title?"],
+  powerquery: ["Merge vs Append?","Unpivot use case?","Power Query vs formulas?"],
+  vba: ["Difference Sub vs Function?","How to loop rows in VBA?","Error handling in VBA?"],
+  projects: ["Dashboard checklist?","Present analysis in interview?","Variance analysis tips?"],
+};
+
+// ─── RENDER SIDEBAR ───
+function renderSidebar(filter='') {
+  const list = document.getElementById('sidebarList');
+  list.innerHTML = '';
+  let currentCat = null;
+  allLessons.forEach(l => {
+    if(filter && !l.title.toLowerCase().includes(filter.toLowerCase())) return;
+    if(l.category !== currentCat) {
+      currentCat = l.category;
+      const lbl = document.createElement('div');
+      lbl.className = 'section-label';
+      lbl.textContent = curriculum[l.category].label;
+      list.appendChild(lbl);
+    }
+    const item = document.createElement('div');
+    item.className = 'lesson-item' + (currentLesson?.id===l.id?' active':'') + (completedLessons.has(l.id)?' done':'');
+    item.dataset.id = l.id;
+    item.innerHTML = `<span class="li-icon">${getIcon(l.category)}</span>${l.title}
+      ${completedLessons.has(l.id)?'<span class="li-check">✓</span>':''}`;
+    item.onclick = ()=>loadLesson(l);
+    list.appendChild(item);
+  });
+}
+
+function getIcon(cat) {
+  const m={basics:'📗',functions:'📘',lookup:'🔍',logical:'🧮',datetime:'📅',cleaning:'🧹',pivot:'📊',charts:'📈',powerquery:'⚡',vba:'🤖',projects:'🏆'};
+  return m[cat]||'📄';
+}
+
+function filterLessons(v) { renderSidebar(v); }
+
+// ─── LOAD LESSON ───
+function loadLesson(l) {
+  currentLesson = l;
+  renderSidebar();
+  const cat = curriculum[l.category];
+  document.getElementById('lessonBreadcrumb').textContent = `${cat.label} → ${l.title}`;
+  document.getElementById('lessonTitle').textContent = l.title;
+  document.getElementById('lessonMeta').innerHTML =
+    `<span class="meta-pill pill-blue">${l.level}</span>
+     <span class="meta-pill pill-green">⏱ ${l.time}</span>
+     ${completedLessons.has(l.id)?'<span class="meta-pill" style="background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid rgba(34,197,94,0.2)">✅ Completed</span>':''}`;
+  document.getElementById('lessonBody').innerHTML = `<div class="fadein">${l.theory}</div>`;
+  document.getElementById('lessonBody').scrollTop = 0;
+
+  // render practice
+  renderPractice(l);
+
+  // update hints
+  const hints = aiHints[l.category]||[];
+  document.getElementById('aiHints').innerHTML = hints.map(h=>
+    `<button class="hint-btn" onclick="askHint('${h.replace(/'/g,"\\'")}')">💬 ${h}</button>`
+  ).join('');
+
+  // open practice if not done
+  if(!completedLessons.has(l.id) && !practiceOpen) togglePractice();
+
+  // AI welcome
+  pushAiMsg(`👋 Let's learn <b>${l.title}</b>! Read through the content, then try the practice below. Ask me anything!`, false, true);
+}
+
+// ─── PRACTICE ───
+function renderPractice(l) {
+  const pb = document.getElementById('practiceBody');
+  const p = l.practice;
+  if(!p) { pb.innerHTML='<p style="color:var(--text3);font-size:13px;">No exercise for this lesson.</p>'; return; }
+
+  if(p.type==='quiz') {
+    pb.innerHTML = `<div class="quiz-question">❓ ${p.q}</div>
+      <div class="quiz-options">${p.opts.map((o,i)=>`<button class="quiz-opt" onclick="checkQuiz(this,${i},${p.answer})">${o}</button>`).join('')}</div>
+      <div class="result-box" id="practiceResult"></div>
+      <div style="margin-top:12px;display:flex;gap:8px;">
+        <button class="btn btn-ghost" onclick="skipLesson()">Skip</button>
+      </div>`;
+  } else if(p.type==='formula') {
+    pb.innerHTML = `<div class="quiz-question">✍️ ${p.q}</div>
+      <div class="formula-input-wrap">
+        <input class="formula-input" id="formulaInput" placeholder="=TYPE YOUR FORMULA HERE" />
+        <button class="btn btn-accent" onclick="checkFormula()">Check ✓</button>
+      </div>
+      <div class="result-box" id="practiceResult"></div>
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <button class="btn btn-ghost" onclick="showHintMsg()">💡 Hint</button>
+        <button class="btn btn-ghost" onclick="skipLesson()">Skip</button>
+      </div>`;
+
+    document.getElementById('formulaInput').addEventListener('keydown', e=>{
+      if(e.key==='Enter') checkFormula();
+    });
+  }
+}
+
+function checkQuiz(btn, idx, answer) {
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach(o=>o.style.pointerEvents='none');
+  const res = document.getElementById('practiceResult');
+  if(idx===answer) {
+    btn.classList.add('correct');
+    res.className='result-box show ok';
+    res.textContent='✅ Correct! Well done.';
+    completeLesson();
+  } else {
+    btn.classList.add('wrong');
+    opts[answer].classList.add('correct');
+    res.className='result-box show fail';
+    res.textContent=`❌ Not quite. The correct answer is: ${currentLesson.practice.opts[answer]}`;
+    pushAiMsg(`That wasn't correct — the answer is <b>${currentLesson.practice.opts[answer]}</b>. Want me to explain why?`, false);
+  }
+}
+
+function checkFormula() {
+  const input = document.getElementById('formulaInput');
+  const res = document.getElementById('practiceResult');
+  const val = input.value.trim().toLowerCase().replace(/\s/g,'');
+  const ans = currentLesson.practice.answer.toLowerCase().replace(/\s/g,'');
+  if(val === ans) {
+    res.className='result-box show ok';
+    res.textContent='✅ Perfect formula! +25 XP';
+    completeLesson();
+  } else {
+    res.className='result-box show fail';
+    res.textContent=`❌ Not quite. Check your syntax. Hint: ${currentLesson.practice.hint}`;
+    pushAiMsg(`Your formula doesn't match. Hint: <b>${currentLesson.practice.hint}</b>. Try again or ask me!`, false);
+  }
+}
+
+function showHintMsg() {
+  pushAiMsg(`💡 Hint for this exercise: <b>${currentLesson.practice.hint}</b>`, false);
+}
+
+function skipLesson() { completeLesson(false); }
+
+function completeLesson(award=true) {
+  if(!completedLessons.has(currentLesson.id)) {
+    completedLessons.add(currentLesson.id);
+    if(award) { xp += 25; streak += 1; }
+    updateXP();
+    renderSidebar();
+    // update lesson meta
+    document.getElementById('lessonMeta').innerHTML =
+      `<span class="meta-pill pill-blue">${currentLesson.level}</span>
+       <span class="meta-pill pill-green">⏱ ${currentLesson.time}</span>
+       <span class="meta-pill" style="background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid rgba(34,197,94,0.2)">✅ Completed</span>`;
+    if(award) pushAiMsg(`🎉 Excellent! +25 XP earned. You've completed <b>${completedLessons.size}</b> lesson${completedLessons.size>1?'s':''}. Keep going!`, false);
+    // auto-advance
+    setTimeout(autoAdvance, 1200);
+  }
+}
+
+function autoAdvance() {
+  const idx = allLessons.findIndex(l=>l.id===currentLesson.id);
+  if(idx < allLessons.length-1) {
+    const next = allLessons[idx+1];
+    // show next button
+    const pb = document.getElementById('practiceBody');
+    const nextBtn = document.createElement('div');
+    nextBtn.style.marginTop='10px';
+    nextBtn.innerHTML=`<button class="btn btn-accent" onclick="loadLesson(allLessons[${idx+1}])">Next: ${next.title} →</button>`;
+    pb.appendChild(nextBtn);
+  }
+}
+
+// ─── PROGRESS ───
+function updateXP() {
+  document.getElementById('xpBadge').textContent = `⚡ ${xp} XP`;
+  document.getElementById('streakBadge').textContent = `🔥 ${streak} streak`;
+  const pct = Math.round((completedLessons.size / allLessons.length)*100);
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progressPct').textContent = pct+'%';
+}
+
+// ─── TABS ───
+function switchTab(btn, cat) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  // load first lesson of category
+  const first = allLessons.find(l=>l.category===cat);
+  if(first) loadLesson(first);
+}
+
+// ─── PRACTICE TOGGLE ───
+function togglePractice() {
+  practiceOpen = !practiceOpen;
+  const pb = document.getElementById('practiceBody');
+  const tog = document.getElementById('practiceToggle');
+  pb.classList.toggle('open', practiceOpen);
+  tog.textContent = practiceOpen ? '▼ CLOSE' : '▲ OPEN';
+}
+
+// ─── AI TUTOR ───
+let aiConversation = [];
+
+function pushAiMsg(text, isUser=false, clear=false) {
+  const box = document.getElementById('aiMessages');
+  if(clear) box.innerHTML='';
+  const div = document.createElement('div');
+  div.className = 'msg fadein ' + (isUser?'msg-user':'msg-ai');
+  div.innerHTML = text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function showTyping() {
+  const box = document.getElementById('aiMessages');
+  const div = document.createElement('div');
+  div.className = 'msg-typing';
+  div.id = 'typing';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+function hideTyping() {
+  const t = document.getElementById('typing');
+  if(t) t.remove();
+}
+
+async function sendAiMessage() {
+  const input = document.getElementById('aiInput');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  pushAiMsg(text, true);
+
+  const context = currentLesson
+    ? `The student is on lesson: "${currentLesson.title}" in the "${curriculum[currentLesson.category].label}" section of an Excel learning platform for data analysts. `
+    : 'The student is on an Excel learning platform for data analysts. ';
+
+  aiConversation.push({ role:'user', content: context + text });
+
+  showTyping();
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`You are an expert Excel tutor for data analysts. Be concise (max 3-4 sentences), practical, and use examples. Format with <code> for formulas/functions. Use <b> for key terms. Focus on interview-relevant knowledge. Encourage the student!`,
+        messages: aiConversation.slice(-6)
+      })
+    });
+    const data = await res.json();
+    hideTyping();
+    const reply = data.content?.[0]?.text || "Let me explain that differently! Can you rephrase your question?";
+    aiConversation.push({ role:'assistant', content: reply });
+    pushAiMsg(reply, false);
+  } catch(e) {
+    hideTyping();
+    pushAiMsg("I'm having trouble connecting. Please check your internet and try again!", false);
+  }
+}
+
+function askHint(h) {
+  document.getElementById('aiInput').value = h;
+  sendAiMessage();
+}
+
+function handleAiKey(e) {
+  if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendAiMessage(); }
+}
+
+// ─── INIT ───
+renderSidebar();
+const firstLesson = allLessons[0];
+loadLesson(firstLesson);
+
+// Welcome AI message
+setTimeout(()=>{
+  pushAiMsg(`👋 Hi! I'm your <b>Excel AI Tutor</b>. Ask me anything about Excel — formulas, shortcuts, concepts, or how to solve a problem. I'm here to help you ace that data analyst interview! 🚀`, false, true);
+}, 300);
+</script>
+</body>
+</html>
